@@ -1,0 +1,9 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: awx-operators
+spec:
+  sourceType: grpc
+  image: quay.io/lbroudoux/awx-operator-registry:0.0.1
+  displayName: AWX Operator
+  publisher: Red Hat France

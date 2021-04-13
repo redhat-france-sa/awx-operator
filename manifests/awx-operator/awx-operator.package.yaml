@@ -1,0 +1,5 @@
+packageName: awx-operator
+channels:
+- name: beta
+  currentCSV: awx-operator.v0.0.1
+defaultChannel: beta

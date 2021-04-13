@@ -1,0 +1,510 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "awx.ansible.com/v1beta1",
+          "kind": "AWX",
+          "metadata": {
+            "name": "example-awx",
+            "namespace": "example-awx"
+          },
+          "spec": {
+            "deployment_type": "awx",
+            "tower_ingress_type": "ingress",
+            "tower_task_resource_requirements": {
+              "requests": {
+                "cpu": "500m",
+                "memory": "128M"
+              }
+            },
+            "tower_web_resource_requirements": {
+              "requests": {
+                "cpu": "500m",
+                "memory": "128M"
+              }
+            }
+          }
+        }
+      ]
+    capabilities: Basic Install
+    operators.operatorframework.io/builder: operator-sdk-v0.19.4
+    operators.operatorframework.io/project_layout: ansible
+  name: awx-operator.v0.0.1
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - description: A AWX Instance
+      displayName: AWX
+      kind: AWX
+      name: awxs.awx.ansible.com
+      specDescriptors:
+      - displayName: Hostname
+        path: tower_hostname
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - displayName: Admin account username
+        path: tower_admin_user
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - displayName: Admin email address
+        path: tower_admin_email
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - displayName: Admin password secret
+        path: tower_admin_password_secret
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:io.kubernetes:Secret
+      - displayName: Database configuration secret
+        path: tower_postgres_configuration_secret
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:io.kubernetes:Secret
+      - displayName: Old Database configuration secret
+        path: tower_old_postgres_configuration_secret
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:io.kubernetes:Secret
+      - displayName: Secret key secret
+        path: tower_secret_key_secret
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:io.kubernetes:Secret
+      - displayName: Broadcast Websocket Secret
+        path: tower_broadcast_websocket_secret
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:io.kubernetes:Secret
+      - displayName: Ingress Type
+        path: tower_ingress_type
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:select:none
+        - urn:alm:descriptor:com.tectonic.ui:select:Ingress
+        - urn:alm:descriptor:com.tectonic.ui:select:Route
+        - urn:alm:descriptor:com.tectonic.ui:select:LoadBalancer
+      - displayName: Tower Ingress Annotations
+        path: tower_ingress_annotations
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:text
+        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:tower_ingress_type:Ingress
+      - displayName: Tower Ingress TLS Secret
+        path: tower_ingress_tls_secret
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:io.kubernetes:Secret
+        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:tower_ingress_type:Ingress
+      - displayName: Tower LoadBalancer Annotations
+        path: tower_loadbalancer_annotations
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:text
+        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:tower_ingress_type:LoadBalancer
+      - displayName: Tower LoadBalancer Protocol
+        path: tower_loadbalancer_protocol
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:select:http
+        - urn:alm:descriptor:com.tectonic.ui:select:https
+        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:tower_ingress_type:LoadBalancer
+      - displayName: Tower LoadBalancer Port
+        path: tower_loadbalancer_port
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:number
+        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:tower_ingress_type:LoadBalancer
+      - displayName: Route DNS host
+        path: tower_route_host
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:text
+        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:tower_ingress_type:Route
+      - displayName: Route TLS termination mechanism
+        path: tower_route_tls_termination_mechanism
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:select:Edge
+        - urn:alm:descriptor:com.tectonic.ui:select:Passthrough
+        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:tower_ingress_type:Route
+      - displayName: Route TLS credential secret
+        path: tower_route_tls_secret
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:io.kubernetes:Secret
+        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:tower_ingress_type:Route
+      - displayName: Image Pull Policy
+        path: tower_image_pull_policy
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:imagePullPolicy
+      - displayName: Image Pull Secret
+        path: tower_image_pull_secret
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:imagePullSecret
+      - displayName: Web container resource requirements
+        path: tower_web_resource_requirements
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:resourceRequirements
+      - displayName: Task container resource requirements
+        path: tower_task_resource_requirements
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:resourceRequirements
+      - displayName: PostgreSQL container resource requirements (when using a managed
+          instance)
+        path: tower_postgres_resource_requirements
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:resourceRequirements
+      - displayName: Replicas
+        path: tower_replicas
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:number
+      - displayName: Remove used secrets on instance removal ?
+        path: tower_garbage_collect_secrets
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+      - displayName: Preload instance with data upon creation ?
+        path: tower_create_preload_data
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+      - displayName: Deploy the instance in development mode ?
+        path: development_mode
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: Should Tower Task container deployed with privileged level ?
+        path: tower_task_privileged
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: Deployment Type
+        path: deployment_type
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: Tower Image
+        path: tower_image
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: Redis Image
+        path: tower_redis_image
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: PostgreSQL Image
+        path: tower_postgres_image
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: Tower Postgres Storage Class
+        path: tower_postgres_storage_class
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: Tower Postgres Datapath
+        path: tower_postgres_data_path
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: Certificate Authorirty Trust Bundle
+        path: ca_trust_bundle
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: LDAP Certificate Authority Trust Bundle
+        path: ldap_cacert_secret
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:io.kubernetes:Secret
+      - displayName: Tower Task Args
+        path: tower_task_args
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: Enable persistence for /var/lib/projects directory?
+        path: tower_projects_persistence
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+      - displayName: Use existing Persistent Claim?
+        path: tower_projects_use_existing_claim
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:select:_Yes_
+        - urn:alm:descriptor:com.tectonic.ui:select:_No_
+        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:tower_projects_persistence:true
+      - displayName: Tower Projects Existing Persistent Claim
+        path: tower_projects_existing_claim
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:tower_projects_use_existing_claim:_Yes_
+        - urn:alm:descriptor:io.kubernetes:PersistentVolumeClaim
+      - description: Tower Projects Storage Class Name. If not present, the default
+          storage class will be used.
+        displayName: Tower Projects Storage Class Name
+        path: tower_projects_storage_class
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:tower_projects_use_existing_claim:_No_
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - description: Tower Projects Storage Size
+        displayName: Tower Projects Storage Size
+        path: tower_projects_storage_size
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:tower_projects_use_existing_claim:_No_
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - description: Tower Projects Storage Access Mode
+        displayName: Tower Projects Storage Access Mode
+        path: tower_projects_storage_access_mode
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:tower_projects_use_existing_claim:_No_
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - displayName: Tower Task Command
+        path: tower_task_command
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: Tower Task Extra Env
+        path: tower_task_extra_env
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: Tower Task Extra Volume Mounts
+        path: tower_task_extra_volume_mounts
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: Tower Web Args
+        path: tower_web_args
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: Tower Web Command
+        path: tower_web_command
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: Tower Web Extra Env
+        path: tower_web_extra_env
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: Tower Web Extra Volume Mounts
+        path: tower_web_extra_volume_mounts
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: Tower Extra Volumes
+        path: tower_extra_volumes
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: Tower Node Selector
+        path: tower_node_selector
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: Tower Tolerations
+        path: tower_tolerations
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      statusDescriptors:
+      - description: Route to access the instance deployed
+        displayName: URL
+        path: towerURL
+        x-descriptors:
+        - urn:alm:descriptor:org.w3:link
+      - description: Admin user for the instance deployed
+        displayName: Admin User
+        path: towerAdminUser
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - description: Admin password for the instance deployed
+        displayName: Admin Password
+        path: towerAdminPasswordSecret
+        x-descriptors:
+        - urn:alm:descriptor:io.kubernetes:Secret
+      - description: Version of the instance deployed
+        displayName: Version
+        path: towerVersion
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - description: Image of the instance deployed
+        displayName: Image
+        path: towerImage
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      version: v1beta1
+  description: AWX operator
+  displayName: AWX
+  icon:
+  - base64data: ""
+    mediatype: ""
+  install:
+    spec:
+      clusterPermissions:
+      - rules:
+        - apiGroups:
+          - route.openshift.io
+          resources:
+          - routes
+          - routes/custom-host
+          verbs:
+          - '*'
+        - apiGroups:
+          - ""
+          - rbac.authorization.k8s.io
+          resources:
+          - pods
+          - services
+          - services/finalizers
+          - serviceaccounts
+          - endpoints
+          - persistentvolumeclaims
+          - events
+          - configmaps
+          - secrets
+          - roles
+          - rolebindings
+          verbs:
+          - '*'
+        - apiGroups:
+          - apps
+          - extensions
+          resources:
+          - deployments
+          - daemonsets
+          - replicasets
+          - statefulsets
+          - ingresses
+          verbs:
+          - '*'
+        - apiGroups:
+          - monitoring.coreos.com
+          resources:
+          - servicemonitors
+          verbs:
+          - get
+          - create
+        - apiGroups:
+          - apps
+          resourceNames:
+          - awx-operator
+          resources:
+          - deployments/finalizers
+          verbs:
+          - update
+        - apiGroups:
+          - apps
+          resources:
+          - deployments/scale
+          verbs:
+          - patch
+        - apiGroups:
+          - ""
+          resources:
+          - pods/exec
+          verbs:
+          - create
+          - get
+        - apiGroups:
+          - apps
+          resources:
+          - replicasets
+          verbs:
+          - get
+        - apiGroups:
+          - awx.ansible.com
+          resources:
+          - '*'
+          verbs:
+          - '*'
+        serviceAccountName: awx-operator
+      deployments:
+      - name: awx-operator
+        spec:
+          replicas: 1
+          selector:
+            matchLabels:
+              name: awx-operator
+          strategy: {}
+          template:
+            metadata:
+              labels:
+                name: awx-operator
+            spec:
+              containers:
+              - env:
+                - name: WATCH_NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.annotations['olm.targetNamespaces']
+                - name: POD_NAME
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.name
+                - name: OPERATOR_NAME
+                  value: awx-operator
+                - name: ANSIBLE_GATHERING
+                  value: explicit
+                image: quay.io/ansible/awx-operator:devel
+                imagePullPolicy: Always
+                livenessProbe:
+                  httpGet:
+                    path: /healthz
+                    port: 6789
+                  initialDelaySeconds: 15
+                  periodSeconds: 20
+                name: awx-operator
+                resources: {}
+                volumeMounts:
+                - mountPath: /tmp/ansible-operator/runner
+                  name: runner
+              serviceAccountName: awx-operator
+              volumes:
+              - emptyDir: {}
+                name: runner
+    strategy: deployment
+  installModes:
+  - supported: true
+    type: OwnNamespace
+  - supported: true
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
+  keywords:
+  - awx
+  links:
+  - name: Awx Operator
+    url: https://github.com/ansible/awx-operator
+  maintainers:
+  - email: yguenane@redhat.com
+    name: Yanis Guenane
+  maturity: alpha
+  provider:
+    name: AWX Community
+    url: https://github.com/ansible/awx-operator
+  version: 0.0.1
